@@ -124,6 +124,7 @@ infra:
       POSTGRES_DB: sausage-store
       POSTGRES_PASSWORD: storepassword
       POSTGRES_USER: store
+      POSTGRES_DATA: /var/lib/postgresql/data/pgdata
     containerPort: 5432
 
   mongodb:

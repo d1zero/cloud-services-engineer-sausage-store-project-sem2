@@ -62,7 +62,7 @@ metadata:
 data:
   POSTGRES_DB: "{{ .Values.postgresql.env.POSTGRES_DB }}"
   POSTGRES_USER: "{{ .Values.postgresql.env.POSTGRES_USER }}"
-  PGDATA: "{{ .Values.postgresql.env.PGDATA }}"
+  PGDATA: "{{ .Values.postgresql.env.POSTGRES_DATA }}"
 
 ---
 apiVersion: v1

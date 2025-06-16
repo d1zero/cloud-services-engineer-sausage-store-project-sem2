@@ -1,36 +1,74 @@
-# Sausage Store
+# Sausage Store — Развёртывание в Kubernetes
 
-![image](https://user-images.githubusercontent.com/9394918/121517767-69db8a80-c9f8-11eb-835a-e98ca07fd995.png)
+### Предварительные требования
 
+Перед запуском убедитесь, что на вашей машине установлены следующие инструменты:
 
-## Technologies used
+- [`kubectl`](https://kubernetes.io/docs/tasks/tools/)
+- [`helm`](https://helm.sh/docs/intro/install/)
 
-* Frontend – TypeScript, Angular.
-* Backend  – Java 16, Spring Boot, Spring Data.
-* Database – H2.
+### Установка приложения
 
-## Installation guide
-### Backend
-
-Install Java 16 and maven and run:
+1. Перейдите в директорию с Helm chart'ом:
 
 ```bash
-cd backend
-mvn package
-cd target
-java -jar sausage-store-0.0.1-SNAPSHOT.jar
+cd sausage-store-chart
 ```
 
-### Frontend
-
-Install NodeJS and npm on your computer and run:
+2. Установите Helm-чарт:
 
 ```bash
-cd frontend
-npm install
-npm run build
-npm install -g http-server
-sudo http-server ./dist/frontend/ -p 80 --proxy http://localhost:8080
+helm install sausage-store .
 ```
 
-Then open your browser and go to [http://localhost](http://localhost)
+3. Убедитесь, что все поды успешно запущены:
+
+```bash
+kubectl get pods
+```
+
+### Проверка работоспособности
+
+- Деплойменты:
+
+```bash
+kubectl get deployments
+```
+
+- Логи:
+
+```bash
+kubectl logs deployment/sausage-store-frontend
+kubectl logs deployment/sausage-store-backend
+kubectl logs deployment/sausage-store-backend-report
+```
+
+- Cервисы:
+
+```bash
+kubectl get svc
+```
+
+- Ингрессы
+
+```bash
+kubectl get ingress
+```
+
+- VPA
+
+```bash
+kubectl describe vpa sausage-store-backend-vpa
+```
+
+- HPA
+
+```bash
+kubectl describe hpa sausage-store-backend-report-hpa
+```
+
+### Доступ к приложению
+
+После успешного развёртывания приложение будет доступно по ссылке:
+
+https://front-timofeev.2sem.students-projects.ru

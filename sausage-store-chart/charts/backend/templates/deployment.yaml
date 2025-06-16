@@ -36,7 +36,7 @@ spec:
           env:
             - name: SPRING_DATASOURCE_URL
               valueFrom:
-                configMapKeyRef:
+                secretKeyRef:
                   name: {{ .Release.Name }}-{{ .Chart.Name }}-secret
                   key: postgres_uri
             - name: SPRING_DATASOURCE_USERNAME
@@ -46,7 +46,7 @@ spec:
                   key: postgres_user
             - name: SPRING_DATASOURCE_PASSWORD
               valueFrom:
-                configMapKeyRef:
+                secretKeyRef:
                   name: {{ .Release.Name }}-{{ .Chart.Name }}-secret
                   key: postgres_password
             - name: REPORT_PATH
