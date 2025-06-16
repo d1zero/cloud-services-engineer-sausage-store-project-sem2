@@ -71,16 +71,14 @@ backend:
       updateMode: "Off"
     resourcePolicy:
       containerPolicies:
-        - containerName: {{ .Release.Name }}-{{ .Chart.Name }}
+        - containerName: "*"
           minAllowed:
-            memory: 256Mi
-            cpu: 400m
+            cpu: 300m
+            memory: 180Mi
           maxAllowed:
-            memory: 512Mi
             cpu: 800m
-          controlledResources:
-            - memory
-            - cpu
+            memory: 800Mi
+          controlledResources: ["cpu", "memory"]
 
 backend-report:
   replicas: 1
