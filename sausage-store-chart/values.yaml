@@ -145,7 +145,7 @@ infra:
       MONGO_INITDB_PASSWORD: reportspassword
     containerPort: 27017
 
-  mongodb-init:
+  mongodbInit:
     image: mongo:7.0
     resources:
       requests:

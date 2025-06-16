@@ -14,7 +14,7 @@ spec:
       restartPolicy: OnFailure
       containers:
         - name: mongodb-init
-          image: {{ .Values.mongodb-init.image }}
+          image: {{ .Values.mongodbInit.image }}
           command:
             - /bin/sh
             - -c
