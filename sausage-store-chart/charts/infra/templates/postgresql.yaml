@@ -6,7 +6,7 @@ metadata:
     helm.sh/hook-weight: "-5"
 spec:
   serviceName: postgresql
-  replicas: 1
+  replicas: {{ .Values.postgresql.replicas }}
   selector:
     matchLabels:
       app: postgresql
@@ -17,22 +17,19 @@ spec:
     spec:
       containers:
       - name: postgresql
-        image: postgres:14
+        image: {{ .Values.postgresql.image }}
         envFrom:
           - configMapRef:
-              name: postgresql-conf
+              name: postgresql-confmap
+          - secretRef:
+              name: postgresql-secret
         ports:
         - containerPort: {{ .Values.postgresql.containerPort }}
         resources:
-          requests:
-            cpu: "400m"
-            memory: "300Mi"
-          limits:
-            cpu: "700m"
-            memory: "600Mi"
+{{ toYaml .Values.postgresql.resources | indent 10 }}
         volumeMounts:
         - name: postgresql-data
-          mountPath: /var/lib/postgresql
+          mountPath: /var/lib/postgresql/data
   volumeClaimTemplates:
   - metadata:
       name: postgresql-data
@@ -61,8 +58,17 @@ spec:
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: postgresql-conf
+  name: postgresql-confmap
 data:
-  POSTGRES_DB: {{ .Values.postgresql.env.POSTGRES_DB }}
-  POSTGRES_PASSWORD: {{ .Values.postgresql.env.POSTGRES_PASSWORD }}
-  POSTGRES_USER: {{ .Values.postgresql.env.POSTGRES_USER }}
+  POSTGRES_DB: "{{ .Values.postgresql.env.POSTGRES_DB }}"
+  POSTGRES_USER: "{{ .Values.postgresql.env.POSTGRES_USER }}"
+  PGDATA: "{{ .Values.postgresql.env.PGDATA }}"
+
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: postgresql-secret
+type: Opaque
+stringData:
+  POSTGRES_PASSWORD: "{{ .Values.postgresql.env.POSTGRES_PASSWORD }}"

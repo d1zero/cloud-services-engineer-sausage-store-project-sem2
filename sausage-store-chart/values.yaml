@@ -1,13 +1,8 @@
 global:
-  imagePullPolicy: Always
-  ###vault:
-  ###  host: ip
-  ###  name: vault
-  ###  vaultToken: someToken
+  imagePullPolicy: IfNotPresent
 
 
 frontend:
-### В чарте frontend отсутствуют некоторые важные файлы. Поймите какие и опишите их.
   replicas: 1
   revisionHistoryLimit: 15
   strategy:
@@ -15,7 +10,8 @@ frontend:
   service:
     port: 80
   ingress:
-    host: front-timofeev.students-projects.ru # Корректный домен будет указан в задании
+    host: front-timofeev.students-projects.ru 
+    secretName: 2sem-students-projects-wildcard-secret
     path: /
     pathType: Prefix
   containerPort: 80
@@ -25,8 +21,8 @@ frontend:
       memory: "128Mi"
       cpu: "100m"
     limits:
-      memory: "128Mi"
-      cpu: "1"
+      memory: "256Mi"
+      cpu: "200m"
   nginxConf: nginx.conf
 
 backend:
@@ -42,6 +38,7 @@ backend:
     logPath: /logs
   service:
     port: 8080
+  containerPort: 8080
   revisionHistoryLimit: 15
   replicas: 1
   strategy:
@@ -54,47 +51,78 @@ backend:
   resources:
     requests:
       memory: "256Mi"
-      cpu: "700m"
+      cpu: "600m"
     limits:
       memory: "512Mi"
-      cpu: "1000m"
-  containerPort: 8080
+      cpu: "800m"
   livenessProbe:
     httpGet:
       path: /actuator/health
       port: 8080
       scheme: HTTP
-    initialDelaySeconds: 15
+    initialDelaySeconds: 30
     periodSeconds: 30
     timeoutSeconds: 5
-    failureThreshold: 6
+    failureThreshold: 3
     successThreshold: 1
   vpa:
     enabled: true
     updatePolicy:
-      updateMode: "Recreate"
+      updateMode: "Off"
     resourcePolicy:
       containerPolicies:
         - containerName: {{ .Release.Name }}-{{ .Chart.Name }}
           minAllowed:
             memory: 256Mi
-            cpu: 500m
+            cpu: 400m
           maxAllowed:
             memory: 512Mi
-            cpu: 1000m
+            cpu: 800m
           controlledResources:
             - memory
             - cpu
 
 backend-report:
-### Опишите значения для backend-report
-### Приложение должно использовать стратегию Recreate
-### Приложение использует переменную PORT - порт, на котором оно запустится и DB - Uri-подключение к mongodb. 
-### DB положите в Secret, PORT в ConfigMap
-### Опишите HPA для backend-report
+  replicas: 1
+  strategy:
+    type: Recreate
+  image: d1zero/sausage-backend-report:latest
+  service:
+    port: 8080
+  config:
+    port: 8080
+  containerPort: 8080
+  secret:
+    dbport: 27017
+    dbhost: mongodb
+    dbname: sausage-store
+    dbuser: reports
+    dbpassword: reportspassword
+  resources:
+    requests:
+      cpu: 200m
+      memory: 128Mi
+    limits:
+      cpu: 400m
+      memory: 256Mi
+  hpa:
+    enabled: true
+    minReplicas: 1
+    maxReplicas: 5
+    targetCPUUtilizationPercentage: 70
 
 infra:
   postgresql:
+    replicas: 1
+    image: postgres:14
+    resources:
+      requests:
+        cpu: 400m
+        memory: 300Mi
+        cpu: 400m
+      limits:
+        cpu: 800m
+        memory: 600Mi
     env:
       POSTGRES_DB: sausage-store
       POSTGRES_PASSWORD: storepassword
@@ -102,8 +130,29 @@ infra:
     containerPort: 5432
 
   mongodb:
+    replicas: 1
+    image: mongo:7.0
+    resources:
+      requests:
+        cpu: 50m
+        memory: 128Mi
+      limits:
+        cpu: 400m
+        memory: 256Mi
     env:
-      MONGO_INITDB_ROOT_USERNAME: reports
-      MONGO_INITDB_ROOT_PASSWORD: reportspassword
       MONGO_INITDB_DATABASE: sausage-store
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: rootpassword
+      MONGO_INITDB_USERNAME: reports
+      MONGO_INITDB_PASSWORD: reportspassword
     containerPort: 27017
+
+  mongodb-init:
+    image: mongo:7.0
+    resources:
+      requests:
+        cpu: 50m
+        memory: 64Mi
+      limits:
+        cpu: 50m
+        memory: 128Mi
