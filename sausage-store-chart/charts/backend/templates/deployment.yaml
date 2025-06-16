@@ -37,7 +37,7 @@ spec:
             - name: SPRING_DATASOURCE_URL
               valueFrom:
                 configMapKeyRef:
-                  name: {{ .Release.Name }}-{{ .Chart.Name }}-confmap
+                  name: {{ .Release.Name }}-{{ .Chart.Name }}-secret
                   key: postgres_uri
             - name: SPRING_DATASOURCE_USERNAME
               valueFrom:
