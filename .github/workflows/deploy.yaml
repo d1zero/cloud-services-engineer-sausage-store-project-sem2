@@ -103,7 +103,6 @@ jobs:
         shell: bash
         run: |
           mkdir -p ~/.kube
-          echo "${{ secrets.DOCKER_USER }}"
           echo "${{ secrets.KUBE_CONFIG }}" > ~/.kube/config
       
       - name: Deploy Helm chart
