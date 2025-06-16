@@ -10,7 +10,7 @@ frontend:
   service:
     port: 80
   ingress:
-    host: front-timofeev.students-projects.ru 
+    host: front-timofeev.2sem.students-projects.ru 
     secretName: 2sem-students-projects-wildcard-secret
     path: /
     pathType: Prefix
@@ -115,12 +115,11 @@ infra:
     image: postgres:14
     resources:
       requests:
-        cpu: 400m
-        memory: 300Mi
-        cpu: 400m
+        cpu: 200m
+        memory: 256Mi
       limits:
-        cpu: 800m
-        memory: 600Mi
+        cpu: 500m
+        memory: 512Mi
     env:
       POSTGRES_DB: sausage-store
       POSTGRES_PASSWORD: storepassword
